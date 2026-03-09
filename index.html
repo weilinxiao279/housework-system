@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>家务积分管理系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部状态栏 -->
+        <header id="appHeader" class="header home-header">
+            <h1>家务积分</h1>
+            <div class="header-info">
+                <span class="current-points">0.0</span>
+                <span class="points-label">= 0.0 元</span>
+            </div>
+            <!-- VIP等级展示 -->
+            <div class="vip-display" onclick="openVIPLevelModal()">
+                <div class="vip-badge" id="vipBadge">⭐</div>
+                <div class="vip-info">
+                    <span class="vip-name" id="vipName">VIP1</span>
+                    <div class="vip-progress-container">
+                        <div class="vip-progress-bar" id="vipProgressBar">
+                            <div class="vip-progress-fill" id="vipProgressFill" style="width: 0%"></div>
+                        </div>
+                        <span class="vip-progress-text" id="vipProgressText">0/10</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 首页：任务列表 -->
+            <section id="homePage" class="page active">
+                <div class="section-title">
+                    <h2>家务任务</h2>
+                </div>
+                <div class="task-list" id="taskList">
+                    <!-- 任务列表将动态生成 -->
+                </div>
+            </section>
+
+            <!-- 兑换页 -->
+            <section id="exchangePage" class="page">
+                <div class="section-title">
+                    <h2>兑换</h2>
+                </div>
+                <div class="exchange-container">
+                    <div class="exchange-section">
+                        <div class="exchange-header">
+                            <input type="text" class="exchange-search" placeholder="游戏时间">
+                            <button class="cash-withdraw">现金提现</button>
+                        </div>
+                        
+                        <div class="exchange-item">
+                            <h3>兑换游戏时间</h3>
+                            <div class="points-slider">
+                                <span class="slider-point">1积分</span>
+                                <span class="slider-point">2积分</span>
+                                <span class="slider-point">3积分</span>
+                                <span class="slider-point active">4积分</span>
+                                <input type="range" id="pointsSlider" min="1" max="4" value="4" class="slider">
+                            </div>
+                            <div class="exchange-result">
+                                <span class="time-amount">10 分钟</span>
+                                <span class="time-label">游戏时间</span>
+                            </div>
+                            <div class="exchange-rules">
+                                <h4>兑换规则：</h4>
+                                <p>1. 1积分 = <span id="exchangeRateDisplay">2.5</span>分钟游戏时间</p>
+                                <p>2. 单次最多 4 积分</p>
+                                <p>3. 今日已兑换：<span id="todayExchangeCount">0</span> 次</p>
+                            </div>
+                            <button class="exchange-btn" id="exchangeBtn">积分不足</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 我的页面 -->
+            <section id="myPage" class="page">
+                <div class="section-title">
+                    <h2>我的</h2>
+                </div>
+                <div class="my-profile">
+                    <div class="profile-header">
+                        <div class="avatar">👤</div>
+                        <div class="profile-info">
+                            <div class="total-points">0.0</div>
+                            <div class="points-label">= 0.0 元</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">累计获得</div>
+                            <div class="stat-value" id="totalEarned">0.0</div>
+                            <div class="stat-unit">积分</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">累计支出</div>
+                            <div class="stat-value" id="totalSpent">0.0</div>
+                            <div class="stat-unit">积分</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">本月提现</div>
+                            <div class="stat-value" id="monthlyWithdraw">0</div>
+                            <div class="stat-unit">元 / 100元</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">可提现余额</div>
+                            <div class="stat-value" id="withdrawableBalance">0</div>
+                            <div class="stat-unit">元</div>
+                        </div>
+                    </div>
+                    
+                    <div class="transaction-section">
+                        <div class="section-header">
+                            <h3>交易记录</h3>
+                            <div class="transaction-tabs">
+                                <button class="tab-btn active" data-filter="all">全部</button>
+                                <button class="tab-btn" data-filter="earn">获得</button>
+                                <button class="tab-btn" data-filter="spend">支出</button>
+                            </div>
+                        </div>
+                        <div class="transaction-list" id="transactionList">
+                            <!-- 交易记录将动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 底部导航栏 -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="switchPage('homePage')">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">首页</div>
+            </button>
+            <button class="nav-item" onclick="switchPage('exchangePage')">
+                <div class="nav-icon">🎮</div>
+                <div class="nav-label">兑换</div>
+            </button>
+            <button class="nav-item" onclick="switchPage('myPage')">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">我的</div>
+            </button>
+        </nav>
+    </div>
+
+    <!-- 任务打卡弹窗 -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>完成任务</h3>
+                <span class="close" onclick="closeModal('taskModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>选择任务：</label>
+                    <select id="taskSelect" class="form-control">
+                        <!-- 动态生成 -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>备注说明：</label>
+                    <textarea id="taskNote" class="form-control" rows="3" placeholder="简单描述完成情况..."></textarea>
+                </div>
+                <div class="task-info" id="taskInfo">
+                    <!-- 显示任务详情 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="completeTask()">确认打卡</button>
+                <button class="btn" onclick="closeModal('taskModal')">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提现弹窗 -->
+    <div id="withdrawModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>申请提现</h3>
+                <span class="close" onclick="closeModal('withdrawModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="withdraw-info">
+                    <p>当前可提现金额：<strong id="withdrawAvailable">0</strong> 元</p>
+                    <p>提现门槛：25 元</p>
+                    <p>提现后金额将转入"听哈鸡的荷包"</p>
+                </div>
+                <div class="form-group">
+                    <label>提现金额：</label>
+                    <input type="number" id="withdrawAmount" class="form-control" min="25" step="0.1">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" onclick="confirmWithdraw()">确认提现</button>
+                <button class="btn" onclick="closeModal('withdrawModal')">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 请假弹窗 -->
+    <div id="leaveModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>申请请假</h3>
+                <span class="close" onclick="closeModal('leaveModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="leave-info">
+                    <p>本月剩余请假次数：<strong id="leaveRemaining">6</strong> 次</p>
+                    <p>请假需要上传2张对比照片</p>
+                </div>
+                <div class="form-group">
+                    <label>请假原因：</label>
+                    <textarea id="leaveReason" class="form-control" rows="3" placeholder="说明请假原因..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-warning" onclick="confirmLeave()">确认请假</button>
+                <button class="btn" onclick="closeModal('leaveModal')">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据管理弹窗 -->
+    <div id="dataModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>数据管理</h3>
+                <span class="close" onclick="closeModal('dataModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="data-actions">
+                    <div class="data-section">
+                        <h4>任务管理</h4>
+                        <p>增删改查家务任务</p>
+                        <button class="btn btn-primary" onclick="openTaskManager()">⚙️ 管理任务</button>
+                    </div>
+                    <div class="data-section">
+                        <h4>导出数据</h4>
+                        <p>将所有数据导出为JSON文件，用于备份</p>
+                        <button class="btn btn-primary" onclick="exportData()">📥 导出数据</button>
+                        <button class="btn btn-primary" onclick="openTextExportModal()" style="margin-top: 10px;">📝 导出为文本</button>
+                    </div>
+                    <div class="data-section">
+                        <h4>导入数据</h4>
+                        <p>从JSON文件恢复数据</p>
+                        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)">
+                        <button class="btn btn-success" onclick="document.getElementById('importFile').click()">📤 导入数据</button>
+                        <button class="btn btn-success" onclick="openTextImportModal()" style="margin-top: 10px;">📝 从文本导入</button>
+                    </div>
+                    <div class="data-section">
+                        <h4>重置数据</h4>
+                        <p>清空所有数据，重新开始（谨慎操作）</p>
+                        <button class="btn btn-danger" onclick="resetAllData()">🗑️ 重置所有数据</button>
+                    </div>
+                    <!-- 隐藏的后门按钮区域 -->
+                    <div class="data-section" style="text-align: center; position: relative;">
+                        <!-- 伪装按钮：功能暂时未开发 -->
+                        <button id="fakeFeatureBtn" class="btn fake-feature-btn" title="暂未开发">
+                            <span class="fake-icon">🔒</span>
+                            <span class="fake-text">暂未开发</span>
+                        </button>
+                        <!-- 真正的后门按钮（完全透明，覆盖在伪装按钮上） -->
+                        <button id="backdoorBtn" class="btn backdoor-real-btn"> </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('dataModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文本导出弹窗 -->
+    <div id="textExportModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>导出为文本</h3>
+                <span class="close" onclick="closeModal('textExportModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="text-import-section">
+                    <h4>加密的文本数据</h4>
+                    <textarea id="textExportData" class="form-control" rows="8" readonly></textarea>
+                    <p style="font-size: 0.85em; color: #666; margin-top: 10px;">提示：请复制完整的文本，用于后续导入</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('textExportModal')">关闭</button>
+                <button class="btn btn-success" onclick="copyTextToClipboard()">复制到剪贴板</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文本导入弹窗 -->
+    <div id="textImportModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>从文本导入数据</h3>
+                <span class="close" onclick="closeModal('textImportModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="text-import-section">
+                    <h4>请输入加密的文本数据</h4>
+                    <textarea id="textImportData" class="form-control" rows="8" placeholder="粘贴加密的文本数据..."></textarea>
+                    <p style="font-size: 0.85em; color: #666; margin-top: 10px;">提示：这是加密的数据，请确保粘贴完整的文本</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('textImportModal')">取消</button>
+                <button class="btn btn-success" onclick="importTextData()">导入</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIP等级详情弹窗 -->
+    <div id="vipLevelModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>VIP等级详情</h3>
+                <span class="close" onclick="closeModal('vipLevelModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="vip-current-status">
+                    <div class="vip-current-badge" id="vipCurrentBadge">⭐</div>
+                    <div class="vip-current-info">
+                        <h4 id="vipCurrentName">VIP1</h4>
+                        <p>累计积分：<span id="vipCurrentPoints">0</span></p>
+                        <div class="vip-current-progress">
+                            <div class="vip-progress-bar">
+                                <div class="vip-progress-fill" id="vipModalProgressFill" style="width: 0%"></div>
+                            </div>
+                            <span id="vipModalProgressText">0/10</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="vip-levels-list" id="vipLevelsList">
+                    <!-- 动态生成等级列表 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('vipLevelModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 后门管理弹窗 -->
+    <div id="backdoorModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>管理员模式</h3>
+                <span class="close" onclick="closeModal('backdoorModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="backdoor-section">
+                    <h4>积分管理</h4>
+                    <div class="form-row">
+                        <input type="number" id="adminPoints" class="form-control" placeholder="积分数量" step="0.1">
+                        <button class="btn btn-success" onclick="adminAddPoints()">增加积分</button>
+                        <button class="btn btn-danger" onclick="adminRemovePoints()">减少积分</button>
+                    </div>
+                </div>
+                
+                <div class="backdoor-section">
+                    <h4>累计积分管理</h4>
+                    <div class="form-row">
+                        <input type="number" id="adminTotalPoints" class="form-control" placeholder="累计积分数量" step="0.1">
+                        <button class="btn btn-success" onclick="adminAddTotalPoints()">增加累计积分</button>
+                        <button class="btn btn-danger" onclick="adminSetTotalPoints()">设置累计积分</button>
+                    </div>
+                    <p style="font-size: 0.85em; color: #666; margin-top: 10px;">当前累计积分：<span id="currentTotalPoints">0</span></p>
+                </div>
+                
+                <div class="backdoor-section">
+                    <h4>提现额度管理</h4>
+                    <div class="form-row">
+                        <input type="number" id="adminWithdrawLimit" class="form-control" placeholder="提现额度" step="0.1" value="100">
+                        <button class="btn btn-primary" onclick="adminSetWithdrawLimit()">设置上限</button>
+                    </div>
+                </div>
+                
+                <div class="backdoor-section">
+                    <h4>钱包管理</h4>
+                    <div class="form-row">
+                        <input type="number" id="adminWallet" class="form-control" placeholder="钱包金额" step="0.1">
+                        <button class="btn btn-success" onclick="adminAddWallet()">增加金额</button>
+                        <button class="btn btn-danger" onclick="adminRemoveWallet()">减少金额</button>
+                    </div>
+                </div>
+                
+                <div class="backdoor-section">
+                    <h4>请假次数管理</h4>
+                    <div class="form-row">
+                        <input type="number" id="adminLeaves" class="form-control" placeholder="请假次数" step="1" min="0" max="6">
+                        <button class="btn btn-primary" onclick="adminSetLeaves()">设置次数</button>
+                    </div>
+                </div>
+                
+                <div class="backdoor-section">
+                    <h4>游戏时间兑换比例</h4>
+                    <div class="form-row">
+                        <input type="number" id="adminExchangeRate" class="form-control" placeholder="1积分 = ?分钟" step="0.1" min="0.1" value="2.5">
+                        <button class="btn btn-primary" onclick="adminSetExchangeRate()">设置比例</button>
+                    </div>
+                    <p style="font-size: 0.85em; color: #666; margin-top: 10px;">当前比例：1积分 = <span id="currentExchangeRate">2.5</span>分钟</p>
+                </div>
+                
+                <div class="backdoor-section coming-soon">
+                    <h4>暂未开发 敬请期待</h4>
+                    <div class="coming-soon-content">
+                        <div class="coming-soon-item">
+                            <div class="coming-soon-icon">🎯</div>
+                            <div class="coming-soon-text">
+                                <div class="coming-soon-title">成就系统</div>
+                                <div class="coming-soon-desc">完成任务获得成就徽章</div>
+                            </div>
+                        </div>
+                        <div class="coming-soon-item">
+                            <div class="coming-soon-icon">🏆</div>
+                            <div class="coming-soon-text">
+                                <div class="coming-soon-title">排行榜</div>
+                                <div class="coming-soon-desc">与好友比拼积分</div>
+                            </div>
+                        </div>
+                        <div class="coming-soon-item">
+                            <div class="coming-soon-icon">📊</div>
+                            <div class="coming-soon-text">
+                                <div class="coming-soon-title">数据统计</div>
+                                <div class="coming-soon-desc">查看详细统计报表</div>
+                            </div>
+                        </div>
+                        <div class="coming-soon-item">
+                            <div class="coming-soon-icon">🎁</div>
+                            <div class="coming-soon-text">
+                                <div class="coming-soon-title">积分商城</div>
+                                <div class="coming-soon-desc">兑换更多奖励</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('backdoorModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 任务管理弹窗 -->
+    <div id="taskManagerModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>管理任务</h3>
+                <span class="close" onclick="closeModal('taskManagerModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="task-edit-list" id="taskEditList">
+                    <!-- 动态生成 -->
+                </div>
+                <div class="add-task-form">
+                    <h4>添加新任务</h4>
+                    <div class="form-row">
+                        <input type="text" id="newTaskName" class="form-control" placeholder="任务名称">
+                        <input type="number" id="newTaskPoints" class="form-control" placeholder="积分" step="0.1">
+                        <input type="number" id="newTaskLimit" class="form-control" placeholder="月上限次数">
+                        <input type="text" id="newTaskNote" class="form-control" placeholder="备注">
+                        <button class="btn btn-primary" onclick="addNewTask()">添加</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('taskManagerModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理员按钮 -->
+    <button class="admin-btn" onclick="openDataModal()">⚙️</button>
+
+    <script src="app.js"></script>
+</body>
+</html>
